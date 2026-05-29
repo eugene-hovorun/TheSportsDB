@@ -1,12 +1,10 @@
 {
-  "version": 2,
-  "buildCommand": "npm run build",
   "builds": [
     {
       "src": "dist/server.js",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": ["dist/**", "src/views/**", "src/public/**"]
+        "includeFiles": ["src/views/**", "src/public/**"]
       }
     }
   ],
