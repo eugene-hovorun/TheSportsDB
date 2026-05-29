@@ -1,6 +1,14 @@
 import axios from "axios";
 
-const BASE_URL = "https://www.thesportsdb.com/api/v1/json/123";
+const API_KEY = process.env.SPORTSDB_API_KEY;
+
+if (!API_KEY) {
+  throw new Error(
+    "SPORTSDB_API_KEY is not set. Copy .env.example to .env and fill in the value.",
+  );
+}
+
+const BASE_URL = `https://www.thesportsdb.com/api/v1/json/${API_KEY}`;
 const LEAGUE_ID = "4328"; // English Premier League
 
 const client = axios.create({
@@ -25,8 +33,9 @@ export async function getTeams() {
  * @returns {Promise<Object|null>}
  */
 export async function getTeamById(id) {
-  const { data } = await client.get("/lookupteam.php", { params: { id } });
-  return data.teams?.[0] ?? null;
+  const teams = await getTeams();
+
+  return teams.find((t) => t.idTeam === id) ?? null;
 }
 
 /**

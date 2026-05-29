@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { getPlayerById, getNextEvents, getLastEvents } from "../api.js";
+import { getPlayerById } from "../api.js";
+import { createError } from "../utils/httpError.js";
 
 const router = Router();
 
@@ -7,29 +8,8 @@ const router = Router();
 router.get("/player/:id", async (req, res, next) => {
   try {
     const player = await getPlayerById(req.params.id);
-    if (!player)
-      return res.status(404).render("error", { message: "Player not found." });
+    if (!player) throw createError(404, "Player not found.");
     res.render("player", { player, title: `${player.strPlayer} – EPL Hub` });
-  } catch (err) {
-    next(err);
-  }
-});
-
-// ── JSON endpoints consumed by Vue components ─────────────────────────────────
-
-router.get("/api/team/:id/events/next", async (req, res, next) => {
-  try {
-    const events = await getNextEvents(req.params.id);
-    res.json(events);
-  } catch (err) {
-    next(err);
-  }
-});
-
-router.get("/api/team/:id/events/last", async (req, res, next) => {
-  try {
-    const events = await getLastEvents(req.params.id);
-    res.json(events);
   } catch (err) {
     next(err);
   }
