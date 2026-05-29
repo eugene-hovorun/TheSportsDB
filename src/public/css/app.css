@@ -1027,13 +1027,6 @@ video {
 .duration-300 {
   transition-duration: 300ms;
 }
-/* Used by the team description "Read more" toggle */
-.line-clamp-6 {
-    display: -webkit-box;
-    -webkit-line-clamp: 6;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
 .hover\:border-brand-accent\/50:hover {
   border-color: rgb(0 255 135 / 0.5);
 }

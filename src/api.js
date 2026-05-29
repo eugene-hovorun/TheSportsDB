@@ -65,7 +65,7 @@ export async function getPlayersByTeam(teamId) {
     params: { id: teamId },
   });
   const players = data.player ?? [];
-  cacheSet(key, players, TTL.teams);
+  cacheSet(key, players, TTL.player);
   return players;
 }
 
@@ -120,5 +120,3 @@ export async function getLastEvents(teamId) {
   cacheSet(key, results, TTL.events);
   return results;
 }
-
-export { LEAGUE_ID };

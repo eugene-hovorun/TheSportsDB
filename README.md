@@ -11,7 +11,7 @@ Live demo: _(deploy to Render/Railway and paste URL here)_
 | Layer       | Choice             | Reason                                        |
 | ----------- | ------------------ | --------------------------------------------- |
 | Runtime     | Node.js ≥ 18       | Native ESM, `--watch` dev mode                |
-| Server      | Express 4          | Minimal, battle-tested                        |
+| Server      | Express 5          | Minimal, battle-tested                        |
 | Templating  | EJS                | Simple, logic-friendly, no build step         |
 | Reactivity  | Vue 3 (CDN)        | No bundler needed; drops in on specific pages |
 | Styling     | Tailwind CSS (CDN) | Utility-first, no build step for this scope   |

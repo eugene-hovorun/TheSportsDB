@@ -1,5 +1,5 @@
 /**
- * Vue 3 – Dynamic Events Section
+ * Vue 3 - Dynamic Events Section
  * Registered as a global component and mounted on the team page.
  * Fetches upcoming + recent events from our own JSON proxy endpoints
  * so the free TheSportsDB key is kept server-side.
@@ -23,7 +23,7 @@
     const h = event.intHomeScore;
     const a = event.intAwayScore;
     if (h == null || a == null) return null;
-    return `${h} – ${a}`;
+    return `${h} - ${a}`;
   }
 
   // ── EventCard sub-component ────────────────────────────────────────────────
@@ -70,7 +70,7 @@
       const nextEvents = ref([]);
       const lastEvents = ref([]);
       const loading = ref(true);
-      const error = ref(null);
+      const loadError = ref(null);
 
       async function fetchJson(url) {
         const res = await fetch(url);
@@ -87,14 +87,14 @@
           nextEvents.value = next;
           lastEvents.value = last;
         } catch (err) {
-          error.value = "Could not load fixture data.";
+          loadError.value = "Could not load fixture data.";
           console.error(err);
         } finally {
           loading.value = false;
         }
       });
 
-      return { nextEvents, lastEvents, loading, error };
+      return { nextEvents, lastEvents, loading, loadError };
     },
     template: `
       <div>
@@ -108,7 +108,7 @@
           Loading fixtures…
         </div>
 
-        <div v-else-if="error" class="text-zinc-500 italic text-sm py-4">{{ error }}</div>
+        <div v-else-if="loadError" class="text-zinc-500 italic text-sm py-4">{{ loadError }}</div>
 
         <div v-else class="grid md:grid-cols-2 gap-8">
           <div>

@@ -19,9 +19,14 @@ app.use("/", playersRouter);
 
 app.use((err, _req, res, _next) => {
   console.error(err.stack);
-  res
-    .status(err.status || 500)
-    .render("error", { message: "Something went wrong. Please try again." });
+  const status = err.status || 500;
+
+  res.status(status).render("error", {
+    title: "Error - EPL Hub",
+    message: err.status
+      ? err.message
+      : "Something went wrong. Please try again.",
+  });
 });
 
 app.listen(PORT, () => {
