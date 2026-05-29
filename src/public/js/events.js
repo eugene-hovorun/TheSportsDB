@@ -4,36 +4,40 @@
  * Fetches upcoming + recent events from our own JSON proxy endpoints
  * so the free TheSportsDB key is kept server-side.
  */
-;(function () {
-  const { createApp, defineComponent, ref, onMounted } = Vue
+(function () {
+  const { createApp, defineComponent, ref, onMounted } = Vue;
 
   // ── helpers ────────────────────────────────────────────────────────────────
 
   function formatDate(str) {
-    if (!str) return '—'
-    const d = new Date(str)
-    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+    if (!str) return "—";
+    const d = new Date(str);
+    return d.toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
   }
 
   function scoreLabel(event) {
-    const h = event.intHomeScore
-    const a = event.intAwayScore
-    if (h == null || a == null) return null
-    return `${h} – ${a}`
+    const h = event.intHomeScore;
+    const a = event.intAwayScore;
+    if (h == null || a == null) return null;
+    return `${h} – ${a}`;
   }
 
   // ── EventCard sub-component ────────────────────────────────────────────────
 
   const EventCard = defineComponent({
-    name: 'EventCard',
+    name: "EventCard",
     props: {
       event: { type: Object, required: true },
       isPast: { type: Boolean, default: false },
     },
     setup(props) {
-      const score = () => scoreLabel(props.event)
-      const date  = () => formatDate(props.event.dateEvent)
-      return { score, date }
+      const score = () => scoreLabel(props.event);
+      const date = () => formatDate(props.event.dateEvent);
+      return { score, date };
     },
     template: `
       <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex flex-col gap-2 hover:border-zinc-600 transition-colors">
@@ -52,26 +56,26 @@
         <p v-if="event.strTime" class="text-xs text-zinc-500 text-center">{{ event.strTime }}</p>
       </div>
     `,
-  })
+  });
 
   // ── EventsSection root component ──────────────────────────────────────────
 
   const EventsSection = defineComponent({
-    name: 'EventsSection',
+    name: "EventsSection",
     components: { EventCard },
     props: {
       teamId: { type: String, required: true },
     },
     setup(props) {
-      const nextEvents = ref([])
-      const lastEvents = ref([])
-      const loading    = ref(true)
-      const error      = ref(null)
+      const nextEvents = ref([]);
+      const lastEvents = ref([]);
+      const loading = ref(true);
+      const error = ref(null);
 
       async function fetchJson(url) {
-        const res = await fetch(url)
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        return res.json()
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
       }
 
       onMounted(async () => {
@@ -79,18 +83,18 @@
           const [next, last] = await Promise.all([
             fetchJson(`/api/team/${props.teamId}/events/next`),
             fetchJson(`/api/team/${props.teamId}/events/last`),
-          ])
-          nextEvents.value = next
-          lastEvents.value = last
+          ]);
+          nextEvents.value = next;
+          lastEvents.value = last;
         } catch (err) {
-          error.value = 'Could not load fixture data.'
-          console.error(err)
+          error.value = "Could not load fixture data.";
+          console.error(err);
         } finally {
-          loading.value = false
+          loading.value = false;
         }
-      })
+      });
 
-      return { nextEvents, lastEvents, loading, error }
+      return { nextEvents, lastEvents, loading, error };
     },
     template: `
       <div>
@@ -125,13 +129,12 @@
         </div>
       </div>
     `,
-  })
+  });
 
   // ── Mount ──────────────────────────────────────────────────────────────────
 
-  const el = document.getElementById('events-app')
+  const el = document.getElementById("events-app");
   if (el) {
-    createApp({ components: { EventsSection } })
-      .mount(el)
+    createApp({ components: { EventsSection } }).mount(el);
   }
-})()
+})();
