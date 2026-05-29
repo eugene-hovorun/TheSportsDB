@@ -1,0 +1,13 @@
+{
+  "emmet.includeLanguages": {
+    "ejs": "html"
+  },
+  "files.associations": {
+    "*.ejs": "html"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "j69.ejs-beautify",
+    "editor.formatOnSave": true
+  },
+  "html.autoClosingTags": false
+}

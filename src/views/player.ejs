@@ -1,7 +1,8 @@
 <%- include('partials/header') %>
 
 <div class="mb-6">
-  <a href="javascript:history.back()" class="text-brand-accent hover:underline text-sm">&larr; Back</a>
+  <a href="javascript:history.back()" class="text-brand-accent hover:underline text-sm">&larr;
+    Back</a>
 </div>
 
 <!-- ── Player Hero (SSR) ──────────────────────────────────────────────── -->
@@ -9,13 +10,12 @@
   <!-- Photo -->
   <div class="flex-shrink-0">
     <% if (player.strThumb) { %>
-    <img
-      src="<%= player.strThumb %>/medium"
-      alt="<%= player.strPlayer %>"
-      class="w-48 h-48 rounded-2xl object-cover object-top bg-zinc-800 shadow-xl"
-    />
+    <img src="<%= player.strThumb %>/medium" alt="<%= player.strPlayer %>"
+        class="w-48 h-48 rounded-2xl object-cover object-top bg-zinc-800 shadow-xl" />
     <% } else { %>
-    <div class="w-48 h-48 rounded-2xl bg-zinc-800 flex items-center justify-center text-6xl shadow-xl">👤</div>
+    <div
+        class="w-48 h-48 rounded-2xl bg-zinc-800 flex items-center justify-center text-6xl shadow-xl">
+      👤</div>
     <% } %>
   </div>
 
@@ -23,7 +23,8 @@
   <div class="flex flex-col justify-center gap-3">
     <div>
       <% if (player.strNationality) { %>
-      <p class="text-brand-accent text-sm font-semibold uppercase tracking-widest mb-1"><%= player.strNationality %></p>
+      <p class="text-brand-accent text-sm font-semibold uppercase tracking-widest mb-1">
+        <%= player.strNationality %></p>
       <% } %>
       <h1 class="text-4xl font-bold text-white"><%= player.strPlayer %></h1>
       <p class="text-zinc-400 mt-1 text-base">
@@ -31,7 +32,8 @@
         <% if (player.strTeam) { %>
         &nbsp;&middot;&nbsp;
         <% if (player.idTeam) { %>
-        <a href="/team/<%= player.idTeam %>" class="text-brand-accent hover:underline"><%= player.strTeam %></a>
+        <a href="/team/<%= player.idTeam %>"
+            class="text-brand-accent hover:underline"><%= player.strTeam %></a>
         <% } else { %><%= player.strTeam %><% } %>
         <% } %>
       </p>
@@ -102,7 +104,8 @@
 <!-- ── Fan art banner ─────────────────────────────────────────────────── -->
 <% if (player.strFanart1) { %>
 <div class="rounded-xl overflow-hidden mt-4">
-  <img src="<%= player.strFanart1 %>/medium" alt="" class="w-full h-40 object-cover object-center opacity-60" />
+  <img src="<%= player.strFanart1 %>/medium" alt=""
+      class="w-full h-40 object-cover object-center opacity-60" />
 </div>
 <% } %>
 

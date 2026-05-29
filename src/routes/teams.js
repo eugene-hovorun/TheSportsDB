@@ -19,8 +19,9 @@ router.get("/", async (_req, res, next) => {
 router.get("/team/:id", async (req, res, next) => {
   try {
     const team = await getTeamById(req.params.id);
-    if (!team)
+    if (!team) {
       return res.status(404).render("error", { message: "Team not found." });
+    }
 
     const players = await getPlayersByTeam(req.params.id);
     res.render("team", { team, players, title: `${team.strTeam} – EPL Hub` });

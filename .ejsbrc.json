@@ -1,0 +1,10 @@
+{
+  "end_with_newline": true,
+  "indent_size": 2,
+  "indent_char": " ",
+  "wrap_line_length": 100,
+  "unformatted": [],
+  "content_unformatted": [],
+  "extra_liners": [],
+  "indent_inner_html": false
+}

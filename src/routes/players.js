@@ -3,18 +3,15 @@ import { getPlayerById, getNextEvents, getLastEvents } from "../api.js";
 
 const router = Router();
 
-// Player detail page – data carried via query param to avoid free-tier lockout
-// on lookupplayer.php (which always returns the same demo player on key 123)
-router.get("/player/:id", (req, res) => {
+// Player detail page
+router.get("/player/:id", async (req, res, next) => {
   try {
-    const raw = req.query.data;
-    if (!raw)
+    const player = await getPlayerById(req.params.id);
+    if (!player)
       return res.status(404).render("error", { message: "Player not found." });
-
-    const player = JSON.parse(decodeURIComponent(raw));
     res.render("player", { player, title: `${player.strPlayer} – EPL Hub` });
-  } catch {
-    res.status(400).render("error", { message: "Invalid player data." });
+  } catch (err) {
+    next(err);
   }
 });
 
