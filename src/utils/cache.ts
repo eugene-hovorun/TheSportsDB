@@ -1,28 +1,30 @@
 import { LRUCache } from "lru-cache";
 
-interface CacheEntry<T> {
-  value: T;
-  expiresAt: number;
-}
-
 /**
  * LRU-backed in-memory cache with per-entry TTL.
  *
- * max: 500 entries — enough for every team + squad + event set
- * without unbounded growth under load.
+ * Delegates TTL tracking to lru-cache itself (v10+ native support) rather
+ * than wrapping entries in a manual { value, expiresAt } struct.
+ *
+ * max: 500 entries — enough for the full team list, every squad, and a
+ * rolling window of event sets without unbounded memory growth.
+ *
+ * ttlAutopurge: false — expired entries are evicted lazily on get() rather
+ * than via a background interval, which is fine for a low-traffic server.
  */
-const store = new LRUCache<string, CacheEntry<unknown>>({ max: 500 });
+const store = new LRUCache<string, object>({
+  max: 500,
+  ttlAutopurge: false,
+});
 
 export function get<T>(key: string): T | null {
-  const entry = store.get(key) as CacheEntry<T> | undefined;
-  if (!entry) return null;
-  if (Date.now() > entry.expiresAt) {
-    store.delete(key);
-    return null;
-  }
-  return entry.value;
+  return (store.get(key) as T | undefined) ?? null;
 }
 
-export function set<T>(key: string, value: T, ttlMs = 60_000): void {
-  store.set(key, { value, expiresAt: Date.now() + ttlMs });
+export function set<T extends object>(
+  key: string,
+  value: T,
+  ttlMs = 60_000,
+): void {
+  store.set(key, value, { ttl: ttlMs });
 }

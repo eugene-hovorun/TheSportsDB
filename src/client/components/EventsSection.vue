@@ -37,7 +37,9 @@ onMounted(async () => {
 
 <template>
   <div>
-    <h2 class="text-xl font-semibold text-white mb-6 border-b border-zinc-800 pb-2">
+    <h2
+      class="text-xl font-semibold text-white mb-6 border-b border-zinc-800 pb-2"
+    >
       Fixtures &amp; Results
     </h2>
 
@@ -49,19 +51,30 @@ onMounted(async () => {
         fill="none"
         viewBox="0 0 24 24"
       >
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+        <circle
+          class="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          stroke-width="4"
+        />
         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
       </svg>
       Loading fixtures…
     </div>
 
     <!-- Error -->
-    <div v-else-if="loadError" class="text-zinc-500 italic text-sm py-4">{{ loadError }}</div>
+    <div v-else-if="loadError" class="text-zinc-500 italic text-sm py-4">
+      {{ loadError }}
+    </div>
 
     <!-- Content -->
     <div v-else class="grid md:grid-cols-2 gap-8">
       <div>
-        <h3 class="text-sm font-semibold text-brand-accent uppercase tracking-widest mb-3">
+        <h3
+          class="text-sm font-semibold text-brand-accent uppercase tracking-widest mb-3"
+        >
           Upcoming
         </h3>
         <div v-if="nextEvents.length" class="space-y-3">
@@ -72,11 +85,15 @@ onMounted(async () => {
             :is-past="false"
           />
         </div>
-        <p v-else class="text-zinc-500 text-sm italic">No upcoming fixtures found.</p>
+        <p v-else class="text-zinc-500 text-sm italic">
+          No upcoming fixtures found.
+        </p>
       </div>
 
       <div>
-        <h3 class="text-sm font-semibold text-zinc-400 uppercase tracking-widest mb-3">
+        <h3
+          class="text-sm font-semibold text-zinc-400 uppercase tracking-widest mb-3"
+        >
           Recent Results
         </h3>
         <div v-if="lastEvents.length" class="space-y-3">
@@ -87,7 +104,9 @@ onMounted(async () => {
             :is-past="true"
           />
         </div>
-        <p v-else class="text-zinc-500 text-sm italic">No recent results found.</p>
+        <p v-else class="text-zinc-500 text-sm italic">
+          No recent results found.
+        </p>
       </div>
     </div>
   </div>

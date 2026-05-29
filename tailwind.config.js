@@ -1,8 +1,5 @@
 export default {
-  content: [
-    "./src/views/**/*.ejs",
-    "./src/client/**/*.{vue,ts}",
-  ],
+  content: ["./src/views/**/*.ejs", "./src/client/**/*.{vue,ts}"],
   theme: {
     extend: {
       fontFamily: {
@@ -10,9 +7,9 @@ export default {
       },
       colors: {
         brand: {
-          DEFAULT: "#38003c",
+          DEFAULT: "#005fcc",
           light: "#e90052",
-          accent: "#00ff87",
+          accent: "#0077FF",
         },
       },
     },

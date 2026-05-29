@@ -8,15 +8,17 @@ Live demo: _(deploy to Render/Railway and paste URL here)_
 
 ## Tech Stack
 
-| Layer       | Choice             | Reason                                        |
-| ----------- | ------------------ | --------------------------------------------- |
-| Runtime     | Node.js ≥ 18       | Native ESM, `--watch` dev mode                |
-| Server      | Express 5          | Minimal, battle-tested                        |
-| Templating  | EJS                | Simple, logic-friendly, no build step         |
-| Reactivity  | Vue 3 (CDN)        | No bundler needed; drops in on specific pages |
-| Styling     | Tailwind CSS (CDN) | Utility-first, no build step for this scope   |
-| Data        | TheSportsDB v1 API | Free, covers EPL teams + players              |
-| HTTP client | axios              | Clean API, timeout support                    |
+| Layer       | Choice          | Reason                                                     |
+| ----------- | --------------- | ---------------------------------------------------------- |
+| Runtime     | Node.js ≥ 18    | Native ESM, `--watch` dev mode                             |
+| Server      | Express 5       | Minimal, battle-tested                                     |
+| Templating  | EJS             | Simple, logic-friendly, no client build step               |
+| Reactivity  | Vue 3 (SFC)     | Compiled via Vite; scoped to the events widget             |
+| Bundler     | Vite 5          | Compiles Vue SFCs and Tailwind for the client bundle       |
+| Styling     | Tailwind CSS v3 | Utility-first; scanned across EJS views and Vue components |
+| Data        | TheSportsDB v1  | Free tier covers EPL teams, squads, fixtures, and players  |
+| HTTP client | axios           | Clean API, configurable timeout                            |
+| Cache       | lru-cache v11   | In-process LRU with native per-entry TTL                   |
 
 ---
 
@@ -24,24 +26,34 @@ Live demo: _(deploy to Render/Railway and paste URL here)_
 
 ```
 src/
-├── server.js              # Express entry – view engine, static, routes
-├── api.js                 # TheSportsDB API client (all fetch logic lives here)
+├── server.ts                  # Express entry – view engine, static files, routes, error handler
+├── api.ts                     # TheSportsDB API client (all fetch + cache logic)
+├── types/
+│   └── api.ts                 # Shared TypeScript interfaces for API response shapes
 ├── utils/
-│   └── cache.js           # In-memory TTL cache (Map-based, no dependencies)
+│   ├── cache.ts               # Thin wrapper around lru-cache (get / set with TTL)
+│   ├── httpError.ts           # createError(status, message) helper for route handlers
+│   └── imgUrl.ts              # Null-safe TheSportsDB image URL builder
 ├── routes/
-│   ├── teams.js           # GET /  (team list)  +  GET /team/:id  (team detail)  +  GET /api/team/:id/events/*
-│   └── players.js         # GET /player/:id
+│   ├── teams.ts               # GET /  · GET /team/:id  · GET /api/team/:id/events/{next,last}
+│   └── players.ts             # GET /player/:id
 ├── views/
-│   ├── index.ejs          # Team grid
-│   ├── team.ejs           # Team detail (SSR hero + squad, Vue events)
-│   ├── player.ejs         # Player detail (fully SSR)
-│   ├── error.ejs          # Generic error page
+│   ├── index.ejs              # Team grid (home page)
+│   ├── team.ejs               # Team detail: SSR hero + squad, Vue events widget
+│   ├── player.ejs             # Player detail (fully SSR)
+│   ├── error.ejs              # Catch-all error page
 │   └── partials/
-│       ├── header.ejs     # HTML head + sticky nav
-│       └── footer.ejs     # Attribution footer + closing tags
-└── public/
-    ├── css/app.css        # Custom utilities (line-clamp, etc.)
-    └── js/events.js       # Vue 3 component – fixtures & results
+│       ├── header.ejs         # HTML head, Inter font, app.css, sticky nav
+│       └── footer.ejs         # Attribution + closing tags
+├── client/
+│   ├── main.ts                # Vue app entry - mounts EventsSection on #events-app
+│   ├── style.css              # Tailwind directives (@tailwind base/components/utilities)
+│   └── components/
+│       ├── EventsSection.vue  # Fetches and renders upcoming + recent fixtures
+│       └── EventCard.vue      # Single fixture / result card
+└── public/                    # Static assets served by Express
+    ├── css/app.css            # ← Vite build output (compiled Tailwind)
+    └── js/events.js           # ← Vite build output (compiled Vue bundle)
 ```
 
 ### SSR vs. Vue split
@@ -49,75 +61,93 @@ src/
 **EJS (server-rendered):**
 
 - Team grid (home page)
-- Team hero, description, quick facts, kit/manager/stadium info
-- Squad player cards
+- Team hero, description, quick facts, stadium/manager/kit info
+- Full squad player cards
 - Full player detail page
 
 **Vue 3 (client-side):**
 
-- _Fixtures & Results_ section on the team page — fetches upcoming and recent events via `/api/team/:id/events/next` and `/api/team/:id/events/last`. These are thin proxy routes on our Express server so the TheSportsDB API key never hits the browser.
+- _Fixtures & Results_ section on the team page — loaded after the initial paint via `/api/team/:id/events/next` and `/api/team/:id/events/last`. These are thin proxy endpoints on the Express server so the TheSportsDB API key is never exposed to the browser.
 
-This separation keeps initial paint fast (no FOUC, SEO-friendly content) while still demonstrating reactive Vue components for data that is secondary and non-critical for first load.
+This split keeps first paint fast and content SEO-indexable, while still demonstrating Vue SFC components and client-side data fetching for secondary, time-sensitive data.
 
----
+### Build pipeline
 
-## API Endpoints Used
-
-| Method | Endpoint                                         | Purpose              |
-| ------ | ------------------------------------------------ | -------------------- |
-| `GET`  | `/search_all_teams.php?l=English_Premier_League` | Full team list       |
-| `GET`  | `/lookupteam.php?id=:id`                         | Single team detail   |
-| `GET`  | `/lookup_all_players.php?id=:teamId`             | Squad for a team     |
-| `GET`  | `/lookupplayer.php?id=:id`                       | Single player detail |
-| `GET`  | `/eventsnext.php?id=:teamId`                     | Upcoming fixtures    |
-| `GET`  | `/eventslast.php?id=:teamId`                     | Recent results       |
-
-All calls use the free public key `123`. Rate limit: 30 req/min.
+```
+Vite (client)          tsc (server)
+─────────────          ────────────
+src/client/main.ts  →  src/public/js/events.js
+src/client/style.css → src/public/css/app.css
+src/server.ts       →  dist/server.js   (via tsconfig.server.json)
+```
 
 ---
 
 ## Getting Started
 
 ```bash
-# Clone
+# 1. Clone
 git clone https://github.com/YOUR_USERNAME/epl-hub.git
 cd epl-hub
 
-# Install
+# 2. Install dependencies
 npm install
 
-# Run
-npm start          # production
-npm run dev        # auto-restart on file change (Node ≥ 18)
+# 3. Configure environment
+cp .env.example .env
+# Edit .env and set SPORTSDB_API_KEY (use "123" for the free public key)
+
+# 4a. Development (server auto-restarts + Vite rebuilds on change)
+npm run dev
+
+# 4b. Production build + start
+npm run build
+npm start
 ```
 
 Then open [http://localhost:3000](http://localhost:3000).
 
-No `.env` file is required – the free TheSportsDB key is baked into `src/api.js`. If you get a premium key, replace `123` in that file.
+---
+
+## API Endpoints Used
+
+| Method | TheSportsDB endpoint                             | Purpose              |
+| ------ | ------------------------------------------------ | -------------------- |
+| `GET`  | `/search_all_teams.php?l=English_Premier_League` | Full team list       |
+| `GET`  | `/lookup_all_players.php?id=:teamId`             | Squad for a team     |
+| `GET`  | `/lookupplayer.php?id=:id`                       | Single player detail |
+| `GET`  | `/eventsnext.php?id=:teamId`                     | Upcoming fixtures    |
+| `GET`  | `/eventslast.php?id=:teamId`                     | Recent results       |
+
+The free public key (`123`) covers all endpoints above. Rate limit: 30 req/min.
+Some endpoints (player honours, contracts, transfer history) return only 1 result on the free tier and are intentionally excluded to avoid showing misleading partial data.
 
 ---
 
 ## Design Decisions & Assumptions
 
-1. **No bundler.** Tailwind and Vue 3 are loaded from CDN. For a real production app I'd use Vite + a proper Vue SFC setup, but the task asked to explore EJS + SSR and a bundlerless approach makes the project easier to run and review without a build step.
+1. **League choice: English Premier League.** It has the richest data on TheSportsDB — team badges, fanart, player photos, and biographies are all populated. Other leagues have sparse or missing assets.
 
-2. **League choice: English Premier League (id 4328).** It has the richest data on TheSportsDB – team badges, fanart, player photos and biographies.
+2. **Image sizing.** TheSportsDB CDN supports `/tiny`, `/small`, `/medium`, `/large` suffixes. The app picks the smallest size appropriate for each context (e.g. `/tiny` in the team grid, `/small` for squad cards) to reduce bandwidth.
 
-3. **Image sizing.** TheSportsDB supports `/tiny`, `/small`, `/medium` suffixes on image URLs. The app uses the smallest appropriate size per context (e.g. `/tiny` in the team grid, `/small` for player cards) to keep pages fast.
+3. **`getTeamById` reuses `getTeams()`.** Rather than calling `/lookupteam.php` separately, the team detail route finds its team in the already-cached team list. This avoids a redundant API call on every team page visit and keeps the cache warm.
 
-4. **Free API limitations.** Some endpoints (player honours, contracts, former teams) are limited to 1 result on the free key. These are therefore not included to avoid misleading partial data. Upcoming/last events are capped at ~5 per team.
+4. **In-memory LRU cache.** All API calls are wrapped with `lru-cache` (v11 native TTL). Teams and players are cached for 5 minutes; fixture data for 1 minute (it changes on matchday). The cache lives in-process and resets on restart — Redis or a shared cache layer would be the next step for multi-instance deployments.
 
-5. **Error handling.** All async route handlers `next(err)` to the Express error middleware which renders a dedicated `error.ejs` page instead of crashing.
+5. **Error handling.** All async route handlers call `next(err)`. The central error middleware in `server.ts` renders `error.ejs` with a safe message — stack traces never reach the browser.
 
-6. **No client-side router.** Navigation is traditional multi-page. Vue is scoped strictly to the events widget – it does not take over the whole page. This keeps the EJS/SSR character of the app clear.
+6. **No client-side router.** Navigation is traditional multi-page. Vue is scoped strictly to the events widget; it does not take over the page. This preserves the EJS/SSR character of the app and keeps the Vue bundle small.
 
-7. **In-memory TTL cache.** All API calls in `api.js` are wrapped with a simple Map-based cache (`src/utils/cache.js`). Team and player data is cached for 5 minutes; fixture/results data for 1 minute since it changes on matchday. This keeps the app well within the 30 req/min free tier limit under normal traffic. The cache lives in-process and resets on restart — Redis would be the next step if persistence across deploys were needed.
+7. **`imgUrl` as `app.locals`.** The helper is injected once via `app.locals` so every EJS view can call `imgUrl(src, size)` without explicit `res.render` boilerplate. The trade-off is an implicit dependency — callers need to know it comes from `app.locals`, not the route's local data.
 
 ---
 
 ## Possible Improvements
 
-- Extract Tailwind config to a proper `tailwind.config.js` with a PostCSS build
+- **Vue mount pattern.** The current approach mounts Vue on `#events-app` and resolves `<events-section>` from the in-DOM template. A cleaner alternative: pass `teamId` as a `data-team-id` attribute on the mount element and call `createApp(EventsSection, { teamId }).mount(el)`, eliminating reliance on Vue's DOM template compiler.
+- **Dev tooling.** The `--loader ts-node/esm` flag is considered legacy. Replacing it with `tsx watch` would improve startup time and ESM compatibility.
+- **Persistent cache.** Replace the in-process LRU with Redis for cache survival across deploys and support for multiple server instances.
+- **Pagination.** The squad grid and player list have no pagination; large squads render all at once.
 
 ---
 

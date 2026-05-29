@@ -22,14 +22,23 @@ app.use("/", teamsRouter);
 app.use("/", playersRouter);
 
 // Central error handler
-app.use((err: Error & { status?: number }, _req: Request, res: Response, _next: NextFunction) => {
-  console.error(err.stack);
-  const status = err.status ?? 500;
-  res.status(status).render("error", {
-    title: "Error – EPL Hub",
-    message: err.status ? err.message : "Something went wrong. Please try again.",
-  });
-});
+app.use(
+  (
+    err: Error & { status?: number },
+    _req: Request,
+    res: Response,
+    _next: NextFunction,
+  ) => {
+    console.error(err.stack);
+    const status = err.status ?? 500;
+    res.status(status).render("error", {
+      title: "Error – EPL Hub",
+      message: err.status
+        ? err.message
+        : "Something went wrong. Please try again.",
+    });
+  },
+);
 
 app.listen(PORT, () => {
   console.log(`EPL Hub running at http://localhost:${PORT}`);

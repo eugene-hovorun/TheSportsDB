@@ -29,7 +29,9 @@ const date = formatDate(props.event.dateEvent);
     class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex flex-col gap-2 hover:border-zinc-600 transition-colors"
   >
     <div class="flex items-center justify-between gap-2">
-      <span class="text-xs text-zinc-500 uppercase tracking-wider">{{ event.strLeague }}</span>
+      <span class="text-xs text-zinc-500 uppercase tracking-wider">
+        {{ event.strLeague }}
+      </span>
       <span class="text-xs text-zinc-500">{{ date }}</span>
     </div>
 
@@ -51,6 +53,8 @@ const date = formatDate(props.event.dateEvent);
       </span>
     </div>
 
-    <p v-if="event.strTime" class="text-xs text-zinc-500 text-center">{{ event.strTime }}</p>
+    <p v-if="event.strTime" class="text-xs text-zinc-500 text-center">
+      {{ event.strTime }}
+    </p>
   </div>
 </template>

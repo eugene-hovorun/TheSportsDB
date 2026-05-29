@@ -9,7 +9,10 @@
  * Returns '' when src is null/undefined so EJS conditionals still work:
  *   <% if (imgUrl(team.strBadge, 'small')) { %>
  */
-export function imgUrl(src: string | null | undefined, size: "tiny" | "small" | "medium" | "large"): string {
+export function imgUrl(
+  src: string | null | undefined,
+  size: "tiny" | "small" | "medium" | "large",
+): string {
   if (!src) return "";
   return `${src}/${size}`;
 }

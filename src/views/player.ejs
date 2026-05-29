@@ -1,8 +1,7 @@
 <%- include('partials/header') %>
 
 <div class="mb-6">
-  <a href="<% if (player.idTeam) { %>/team/<%= player.idTeam %><% } else { %>/<% } %>"
-      class="text-brand-accent hover:underline text-sm">&larr; Back</a>
+  <a href="<% if (player.idTeam) { %>/team/<%= player.idTeam %><% } else { %>/<% } %>" class="text-brand-accent hover:underline text-sm">&larr; Back</a>
 </div>
 
 <!-- ── Player Hero (SSR) ──────────────────────────────────────────────── -->
@@ -11,11 +10,9 @@
   <div class="flex-shrink-0">
     <% const thumb = imgUrl(player.strThumb, 'medium') %>
     <% if (thumb) { %>
-    <img src="<%= thumb %>" alt="<%= player.strPlayer %>"
-        class="w-48 h-48 rounded-2xl object-cover object-top bg-zinc-800 shadow-xl" />
+    <img src="<%= thumb %>" alt="<%= player.strPlayer %>" class="w-48 h-48 rounded-2xl object-cover object-top bg-zinc-800 shadow-xl" />
     <% } else { %>
-    <div
-        class="w-48 h-48 rounded-2xl bg-zinc-800 flex items-center justify-center text-6xl shadow-xl">
+    <div class="w-48 h-48 rounded-2xl bg-zinc-800 flex items-center justify-center text-6xl shadow-xl">
       👤</div>
     <% } %>
   </div>
@@ -33,8 +30,7 @@
         <% if (player.strTeam) { %>
         &nbsp;&middot;&nbsp;
         <% if (player.idTeam) { %>
-        <a href="/team/<%= player.idTeam %>"
-            class="text-brand-accent hover:underline"><%= player.strTeam %></a>
+        <a href="/team/<%= player.idTeam %>" class="text-brand-accent hover:underline"><%= player.strTeam %></a>
         <% } else { %><%= player.strTeam %><% } %>
         <% } %>
       </p>
@@ -107,8 +103,7 @@
 <% const fanart = imgUrl(player.strFanart1, 'medium') %>
 <% if (fanart) { %>
 <div class="rounded-xl overflow-hidden mt-4">
-  <img src="<%= fanart %>" alt=""
-      class="w-full h-40 object-cover object-center opacity-60" />
+  <img src="<%= fanart %>" alt="" class="w-full h-40 object-cover object-center opacity-60" />
 </div>
 <% } %>
 
