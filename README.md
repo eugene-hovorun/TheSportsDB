@@ -2,21 +2,21 @@
 
 A server-rendered website for exploring English Premier League teams and players, built with **Express + EJS** (SSR) and **Vue 3** (client-side dynamic sections).
 
-Live demo: *(deploy to Render/Railway and paste URL here)*
+Live demo: _(deploy to Render/Railway and paste URL here)_
 
 ---
 
 ## Tech Stack
 
-| Layer | Choice | Reason |
-|---|---|---|
-| Runtime | Node.js ≥ 18 | Native ESM, `--watch` dev mode |
-| Server | Express 4 | Minimal, battle-tested |
-| Templating | EJS | Simple, logic-friendly, no build step |
-| Reactivity | Vue 3 (CDN) | No bundler needed; drops in on specific pages |
-| Styling | Tailwind CSS (CDN) | Utility-first, no build step for this scope |
-| Data | TheSportsDB v1 API | Free, covers EPL teams + players |
-| HTTP client | axios | Clean API, timeout support |
+| Layer       | Choice             | Reason                                        |
+| ----------- | ------------------ | --------------------------------------------- |
+| Runtime     | Node.js ≥ 18       | Native ESM, `--watch` dev mode                |
+| Server      | Express 4          | Minimal, battle-tested                        |
+| Templating  | EJS                | Simple, logic-friendly, no build step         |
+| Reactivity  | Vue 3 (CDN)        | No bundler needed; drops in on specific pages |
+| Styling     | Tailwind CSS (CDN) | Utility-first, no build step for this scope   |
+| Data        | TheSportsDB v1 API | Free, covers EPL teams + players              |
+| HTTP client | axios              | Clean API, timeout support                    |
 
 ---
 
@@ -26,9 +26,11 @@ Live demo: *(deploy to Render/Railway and paste URL here)*
 src/
 ├── server.js              # Express entry – view engine, static, routes
 ├── api.js                 # TheSportsDB API client (all fetch logic lives here)
+├── utils/
+│   └── cache.js           # In-memory TTL cache (Map-based, no dependencies)
 ├── routes/
-│   ├── teams.js           # GET /  (team list)  +  GET /team/:id  (team detail)
-│   └── players.js         # GET /player/:id  +  GET /api/team/:id/events/*
+│   ├── teams.js           # GET /  (team list)  +  GET /team/:id  (team detail)  +  GET /api/team/:id/events/*
+│   └── players.js         # GET /player/:id
 ├── views/
 │   ├── index.ejs          # Team grid
 │   ├── team.ejs           # Team detail (SSR hero + squad, Vue events)
@@ -45,13 +47,15 @@ src/
 ### SSR vs. Vue split
 
 **EJS (server-rendered):**
+
 - Team grid (home page)
 - Team hero, description, quick facts, kit/manager/stadium info
 - Squad player cards
 - Full player detail page
 
 **Vue 3 (client-side):**
-- *Fixtures & Results* section on the team page — fetches upcoming and recent events via `/api/team/:id/events/next` and `/api/team/:id/events/last`. These are thin proxy routes on our Express server so the TheSportsDB API key never hits the browser.
+
+- _Fixtures & Results_ section on the team page — fetches upcoming and recent events via `/api/team/:id/events/next` and `/api/team/:id/events/last`. These are thin proxy routes on our Express server so the TheSportsDB API key never hits the browser.
 
 This separation keeps initial paint fast (no FOUC, SEO-friendly content) while still demonstrating reactive Vue components for data that is secondary and non-critical for first load.
 
@@ -59,14 +63,14 @@ This separation keeps initial paint fast (no FOUC, SEO-friendly content) while s
 
 ## API Endpoints Used
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| `GET` | `/search_all_teams.php?l=English_Premier_League` | Full team list |
-| `GET` | `/lookupteam.php?id=:id` | Single team detail |
-| `GET` | `/lookup_all_players.php?id=:teamId` | Squad for a team |
-| `GET` | `/lookupplayer.php?id=:id` | Single player detail |
-| `GET` | `/eventsnext.php?id=:teamId` | Upcoming fixtures |
-| `GET` | `/eventslast.php?id=:teamId` | Recent results |
+| Method | Endpoint                                         | Purpose              |
+| ------ | ------------------------------------------------ | -------------------- |
+| `GET`  | `/search_all_teams.php?l=English_Premier_League` | Full team list       |
+| `GET`  | `/lookupteam.php?id=:id`                         | Single team detail   |
+| `GET`  | `/lookup_all_players.php?id=:teamId`             | Squad for a team     |
+| `GET`  | `/lookupplayer.php?id=:id`                       | Single player detail |
+| `GET`  | `/eventsnext.php?id=:teamId`                     | Upcoming fixtures    |
+| `GET`  | `/eventslast.php?id=:teamId`                     | Recent results       |
 
 All calls use the free public key `123`. Rate limit: 30 req/min.
 
@@ -107,16 +111,13 @@ No `.env` file is required – the free TheSportsDB key is baked into `src/api.j
 
 6. **No client-side router.** Navigation is traditional multi-page. Vue is scoped strictly to the events widget – it does not take over the whole page. This keeps the EJS/SSR character of the app clear.
 
+7. **In-memory TTL cache.** All API calls in `api.js` are wrapped with a simple Map-based cache (`src/utils/cache.js`). Team and player data is cached for 5 minutes; fixture/results data for 1 minute since it changes on matchday. This keeps the app well within the 30 req/min free tier limit under normal traffic. The cache lives in-process and resets on restart — Redis would be the next step if persistence across deploys were needed.
+
 ---
 
 ## Possible Improvements
 
-- Add a search bar (Vue-powered, hits `/searchteams.php`)
-- Paginate or filter the squad grid by position
-- Cache API responses in-memory (or Redis) to stay within rate limits
 - Extract Tailwind config to a proper `tailwind.config.js` with a PostCSS build
-- Add E2E tests (Playwright) for team/player navigation
-- Deploy via Dockerfile to Railway or Render
 
 ---
 

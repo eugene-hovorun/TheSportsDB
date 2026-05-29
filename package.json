@@ -3,9 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "node --watch src/server.js"
+    "dev": "concurrently --names \"server,css\" --prefix-colors \"cyan,magenta\" \"node --watch src/server.js\" \"npm run css:watch\"",
+    "css:build": "postcss src/public/css/app.src.css -o src/public/css/app.css",
+    "css:watch": "postcss src/public/css/app.src.css -o src/public/css/app.css --watch",
+    "build": "npm run css:build"
   },
   "keywords": [],
   "author": "",
@@ -16,7 +20,13 @@
     "ejs": "^6.0.1",
     "express": "^5.2.1"
   },
-  "type": "module",
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "concurrently": "^10.0.0",
+    "postcss": "^8.5.4",
+    "postcss-cli": "^11.0.1",
+    "tailwindcss": "^3.4.17"
+  },
   "engines": {
     "node": ">=18"
   }

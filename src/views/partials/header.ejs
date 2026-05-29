@@ -7,26 +7,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ["Inter", "sans-serif"]
-          },
-          colors: {
-            brand: {
-              DEFAULT: "#38003c",
-              light: "#e90052",
-              accent: "#00ff87",
-            },
-          },
-        },
-      },
-    };
-
-  </script>
   <link rel="stylesheet" href="/css/app.css" />
 </head>
 <body class="font-sans min-h-screen flex flex-col">
@@ -37,8 +17,7 @@
         <span class="text-brand-accent text-2xl">⚽</span>
         EPL Hub
       </a>
-      <a truncate w-full text-center href="/"
-          class="text-zinc-300 hover:text-white text-sm transition-colors">
+      <a href="/" class="text-zinc-300 hover:text-white text-sm transition-colors">
         All Teams
       </a>
     </nav>

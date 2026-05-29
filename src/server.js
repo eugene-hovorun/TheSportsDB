@@ -20,7 +20,7 @@ app.use("/", playersRouter);
 app.use((err, _req, res, _next) => {
   console.error(err.stack);
   res
-    .status(500)
+    .status(err.status || 500)
     .render("error", { message: "Something went wrong. Please try again." });
 });
 

@@ -38,10 +38,8 @@
       <p id="description-text" class="text-zinc-400 text-sm leading-relaxed line-clamp-6">
         <%= desc %>
       </p>
-      <% if (desc.length > 400) { %>
       <button onclick="toggleDesc()" id="desc-btn"
-          class="mt-2 text-brand-accent text-sm hover:underline">Read more</button>
-      <% } %>
+          class="mt-2 text-brand-accent text-sm hover:underline hidden">Read more</button>
     </div>
     <% } else { %>
     <p class="text-zinc-500 text-sm italic">No description available.</p>
@@ -127,6 +125,14 @@
     const expanded = text.classList.toggle('line-clamp-6')
     btn.textContent = expanded ? 'Read more' : 'Show less'
   }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const text = document.getElementById('description-text')
+    const btn = document.getElementById('desc-btn')
+    if (text && btn && text.scrollHeight > text.clientHeight) {
+      btn.classList.remove('hidden')
+    }
+  })
 
 </script>
 
