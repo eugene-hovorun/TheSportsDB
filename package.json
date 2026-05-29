@@ -1,31 +1,37 @@
 {
   "name": "epl-hub",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/server.js",
   "type": "module",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "concurrently --names \"server,css\" --prefix-colors \"cyan,magenta\" \"node --watch src/server.js\" \"npm run css:watch\"",
-    "css:build": "postcss src/public/css/app.src.css -o src/public/css/app.css",
-    "css:watch": "postcss src/public/css/app.src.css -o src/public/css/app.css --watch",
-    "build": "npm run css:build"
+    "dev": "concurrently --names \"server,client\" --prefix-colors \"cyan,green\" \"node --watch --loader ts-node/esm src/server.ts\" \"vite build --watch\"",
+    "build": "tsc -p tsconfig.server.json && vite build",
+    "start": "node dist/server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^1.16.1",
-    "dotenv": "^17.4.2",
-    "ejs": "^6.0.1",
-    "express": "^5.2.1"
+    "axios": "^1.6.0",
+    "dotenv": "^16.4.0",
+    "ejs": "^3.1.10",
+    "express": "^5.2.1",
+    "lru-cache": "^11.5.1"
   },
   "devDependencies": {
+    "@types/ejs": "^3.1.5",
+    "@types/express": "^5.0.6",
+    "@types/node": "^20.14.0",
+    "@vitejs/plugin-vue": "^5.0.5",
     "autoprefixer": "^10.4.21",
-    "concurrently": "^10.0.0",
+    "concurrently": "^8.2.2",
     "postcss": "^8.5.4",
-    "postcss-cli": "^11.0.1",
-    "tailwindcss": "^3.4.17"
+    "tailwindcss": "^3.4.17",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5",
+    "vite": "^5.3.1",
+    "vue": "^3.4.27"
   },
   "engines": {
     "node": ">=18"

@@ -9,8 +9,9 @@
 <div class="flex flex-col sm:flex-row gap-8 mb-10">
   <!-- Photo -->
   <div class="flex-shrink-0">
-    <% if (player.strThumb) { %>
-    <img src="<%= player.strThumb %>/medium" alt="<%= player.strPlayer %>"
+    <% const thumb = imgUrl(player.strThumb, 'medium') %>
+    <% if (thumb) { %>
+    <img src="<%= thumb %>" alt="<%= player.strPlayer %>"
         class="w-48 h-48 rounded-2xl object-cover object-top bg-zinc-800 shadow-xl" />
     <% } else { %>
     <div
@@ -60,9 +61,10 @@
   </div>
 
   <!-- Cutout if available (decorative) -->
-  <% if (player.strCutout) { %>
+  <% const cutout = imgUrl(player.strCutout, 'medium') %>
+  <% if (cutout) { %>
   <div class="hidden xl:block ml-auto flex-shrink-0">
-    <img src="<%= player.strCutout %>/medium" alt="" class="h-48 object-contain" />
+    <img src="<%= cutout %>" alt="" class="h-48 object-contain" />
   </div>
   <% } %>
 </div>
@@ -102,9 +104,10 @@
 </div>
 
 <!-- ── Fan art banner ─────────────────────────────────────────────────── -->
-<% if (player.strFanart1) { %>
+<% const fanart = imgUrl(player.strFanart1, 'medium') %>
+<% if (fanart) { %>
 <div class="rounded-xl overflow-hidden mt-4">
-  <img src="<%= player.strFanart1 %>/medium" alt=""
+  <img src="<%= fanart %>" alt=""
       class="w-full h-40 object-cover object-center opacity-60" />
 </div>
 <% } %>

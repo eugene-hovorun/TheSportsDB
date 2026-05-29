@@ -2,16 +2,18 @@
 
 <!-- ── Team Hero (SSR) ──────────────────────────────────────────────────── -->
 <div class="relative rounded-2xl overflow-hidden mb-10">
-  <% if (team.strFanart1) { %>
-  <img src="<%= team.strFanart1 %>/medium" alt="<%= team.strTeam %> fanart"
+  <% const fanart = imgUrl(team.strFanart1, 'medium') %>
+  <% if (fanart) { %>
+  <img src="<%= fanart %>" alt="<%= team.strTeam %> fanart"
       class="w-full h-52 object-cover object-top" />
   <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent"></div>
   <% } %>
 
   <div
-      class="<%= team.strFanart1 ? 'absolute bottom-0 left-0 right-0' : '' %> p-6 flex items-end gap-6">
-    <% if (team.strBadge) { %>
-    <img src="<%= team.strBadge %>/small" alt="<%= team.strTeam %> badge"
+      class="<%= fanart ? 'absolute bottom-0 left-0 right-0' : '' %> p-6 flex items-end gap-6">
+    <% const badge = imgUrl(team.strBadge, 'small') %>
+    <% if (badge) { %>
+    <img src="<%= badge %>" alt="<%= team.strTeam %> badge"
         class="w-20 h-20 object-contain drop-shadow-xl" />
     <% } %>
     <div>
@@ -90,11 +92,12 @@
   <% } else { %>
   <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-4">
     <% players.forEach(player => { %>
+    <% const thumb = imgUrl(player.strThumb, 'small') %>
     <a href="/player/<%= player.idPlayer %>"
         class="group bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden hover:border-brand-accent/50 hover:bg-zinc-800 transition-all">
       <div class="aspect-square overflow-hidden bg-zinc-800">
-        <% if (player.strThumb) { %>
-        <img src="<%= player.strThumb %>/small" alt="<%= player.strPlayer %>"
+        <% if (thumb) { %>
+        <img src="<%= thumb %>" alt="<%= player.strPlayer %>"
             class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
             loading="lazy" />
         <% } else { %>
@@ -114,9 +117,8 @@
   <% } %>
 </div>
 
-<!-- ── Vue Events Component ─────────────────────────────────────────────── -->
-<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-<script src="/js/events.js"></script>
+<!-- ── Vue Events Component (Vite build) ─────────────────────────────── -->
+<script src="/js/events.js" type="module"></script>
 
 <script>
   function toggleDesc() {

@@ -1,4 +1,19 @@
+# Dependencies
 node_modules/
+
+# Build outputs
+dist/
+src/public/js
+src/public/css
+
+# Environment
 .env
-*.log
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# OS
 .DS_Store
+Thumbs.db

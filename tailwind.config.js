@@ -1,5 +1,8 @@
 export default {
-  content: ["./src/views/**/*.ejs", "./src/public/js/**/*.js"],
+  content: [
+    "./src/views/**/*.ejs",
+    "./src/client/**/*.{vue,ts}",
+  ],
   theme: {
     extend: {
       fontFamily: {

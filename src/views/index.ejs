@@ -10,8 +10,9 @@
   <a href="/team/<%= team.idTeam %>"
       class="group bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex flex-col items-center gap-3 hover:border-brand-accent/60 hover:bg-zinc-800 transition-all duration-200">
 
-    <% if (team.strBadge) { %>
-    <img src="<%= team.strBadge %>/tiny" alt="<%= team.strTeam %> badge"
+    <% const badgeTiny = imgUrl(team.strBadge, 'tiny') %>
+    <% if (badgeTiny) { %>
+    <img src="<%= badgeTiny %>" alt="<%= team.strTeam %> badge"
         class="w-14 h-14 object-contain group-hover:scale-110 transition-transform duration-200"
         loading="lazy" />
     <% } else { %>
