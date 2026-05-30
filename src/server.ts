@@ -11,8 +11,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT ?? 3000;
 
-app.set("views", path.join(process.cwd(), "src/views"));
-app.use(express.static(path.join(process.cwd(), "src/public")));
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "../src/views"));
+app.use(express.static(path.join(__dirname, "../src/public")));
 app.use(express.static(path.join(__dirname, "public")));
 
 // Make imgUrl available as a template local in every render call
