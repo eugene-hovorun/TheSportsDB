@@ -40,6 +40,11 @@ app.use(
   },
 );
 
-app.listen(PORT, () => {
-  console.log(`EPL Hub running at http://localhost:${PORT}`);
-});
+export default app;
+
+// keep listen for local dev:
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, () =>
+    console.log(`EPL Hub running at http://localhost:${PORT}`),
+  );
+}
