@@ -2,7 +2,8 @@
 
 A server-rendered website for exploring English Premier League teams and players, built with **Express + EJS** (SSR) and **Vue 3** (client-side dynamic sections).
 
-Live demo: _(deploy to Render/Railway and paste URL here)_
+**Live demo:** [the-sports-db-three.vercel.app](https://the-sports-db-three.vercel.app)
+**Repository:** [github.com/eugene-hovorun/TheSportsDB](https://github.com/eugene-hovorun/TheSportsDB)
 
 ---
 
@@ -46,14 +47,16 @@ src/
 │       ├── header.ejs         # HTML head, Inter font, app.css, sticky nav
 │       └── footer.ejs         # Attribution + closing tags
 ├── client/
-│   ├── main.ts                # Vue app entry - mounts EventsSection on #events-app
+│   ├── main.ts                # Vue app entry - mounts EventsSection on #events-app via data-team-id
 │   ├── style.css              # Tailwind directives (@tailwind base/components/utilities)
 │   └── components/
 │       ├── EventsSection.vue  # Fetches and renders upcoming + recent fixtures
 │       └── EventCard.vue      # Single fixture / result card
-└── public/                    # Static assets served by Express
-    ├── css/app.css            # ← Vite build output (compiled Tailwind)
-    └── js/events.js           # ← Vite build output (compiled Vue bundle)
+├── public/                    # Static assets served by Express
+│   ├── css/app.css            # ← Vite build output (compiled Tailwind)
+│   └── js/events.js           # ← Vite build output (compiled Vue bundle)
+└── api/
+    └── index.ts               # Vercel serverless entry - re-exports the Express app
 ```
 
 ### SSR vs. Vue split
@@ -87,8 +90,8 @@ src/server.ts       →  dist/server.js   (via tsconfig.server.json)
 
 ```bash
 # 1. Clone
-git clone https://github.com/YOUR_USERNAME/epl-hub.git
-cd epl-hub
+git clone https://github.com/eugene-hovorun/TheSportsDB.git
+cd TheSportsDB
 
 # 2. Install dependencies
 npm install
@@ -106,6 +109,25 @@ npm start
 ```
 
 Then open [http://localhost:3000](http://localhost:3000).
+
+---
+
+## Deployment (Vercel)
+
+The project is pre-configured for Vercel via `vercel.json` and `api/index.ts`.
+
+```bash
+npm i -g vercel
+vercel
+```
+
+Or connect the GitHub repository in the Vercel dashboard (Framework Preset: **Other**) and add the environment variable:
+
+```
+SPORTSDB_API_KEY=123
+```
+
+> **Note:** Vercel runs the app as a serverless function, so the in-memory LRU cache resets on every cold start. This is acceptable for the free TheSportsDB tier but would need a persistent cache (e.g. Redis) for production multi-instance deployments.
 
 ---
 
@@ -140,11 +162,14 @@ Some endpoints (player honours, contracts, transfer history) return only 1 resul
 
 7. **`imgUrl` as `app.locals`.** The helper is injected once via `app.locals` so every EJS view can call `imgUrl(src, size)` without explicit `res.render` boilerplate. The trade-off is an implicit dependency — callers need to know it comes from `app.locals`, not the route's local data.
 
+8. **Vue mount pattern.** `main.ts` uses `createApp(EventsSection, { teamId: el.dataset.teamId }).mount(el)` — the `teamId` prop is passed directly at mount time via the `data-team-id` attribute on `#events-app`, avoiding reliance on Vue's runtime DOM template compiler.
+
+9. **View engine path resolution.** `server.ts` resolves `views` and `static` paths relative to `import.meta.url` (i.e. the compiled file location) rather than `process.cwd()`, so paths are correct both locally and in Vercel's serverless environment.
+
 ---
 
 ## Possible Improvements
 
-- **Vue mount pattern.** The current approach mounts Vue on `#events-app` and resolves `<events-section>` from the in-DOM template. A cleaner alternative: pass `teamId` as a `data-team-id` attribute on the mount element and call `createApp(EventsSection, { teamId }).mount(el)`, eliminating reliance on Vue's DOM template compiler.
 - **Dev tooling.** The `--loader ts-node/esm` flag is considered legacy. Replacing it with `tsx watch` would improve startup time and ESM compatibility.
 - **Persistent cache.** Replace the in-process LRU with Redis for cache survival across deploys and support for multiple server instances.
 - **Pagination.** The squad grid and player list have no pagination; large squads render all at once.
