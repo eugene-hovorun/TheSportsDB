@@ -1,12 +1,15 @@
 {
+  "version": 2,
   "buildCommand": "npm run build",
-  "outputDirectory": "dist",
   "installCommand": "npm install",
-  "framework": null,
-  "functions": {
-    "dist/server.js": {
-      "includeFiles": "src/views/**,src/public/**"
+  "builds": [
+    {
+      "src": "dist/server.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["src/views/**", "src/public/**"]
+      }
     }
-  },
+  ],
   "routes": [{ "src": "/(.*)", "dest": "/dist/server.js" }]
 }
